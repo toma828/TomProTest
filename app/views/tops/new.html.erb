@@ -1,0 +1,41 @@
+<!-- Sign up form -->
+<div class="container d-flex flex-wrap justify-content-center justify-content-xl-start h-100 pt-5">
+    <div class="w-100 align-self-end pt-1 pt-md-4 pb-4" style="max-width: 526px;">
+    <h1 class="text-center text-xl-start">イベント登録</h1>
+    <p class="text-center text-xl-start pb-3 mb-3">Already have an account? <a href="account-signin.html">Sign in here.</a></p>
+    <%= form_with model: @event, local: true, html: {class: "needs-validation"} do |f| %>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="position-relative mb-4">
+                    <%= f.label :title, class: "form-label fs-base" %>
+                    <%= f.text_field :title, class: "form-control form-control-lg" %>
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <div class="position-relative mb-4">
+                    <%= f.label :place, class: "form-label fs-base" %>
+                    <%= f.text_field :place, class: "form-control form-control-lg" %>
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <div class="position-relative mb-4">
+                    <%= f.label :start_at, class: "form-label fs-base" %>
+                    <%= f.datetime_field :start_at, class: "form-control form-control-lg" %>
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <div class="position-relative mb-4">
+                    <%= f.label :description, class: "form-label fs-base" %>
+                    <%= f.text_area :description, class: "form-control form-control-lg" %>
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <div class="position-relative mb-4">
+                    <%= f.label :image, class: "form-label fs-base" %>
+                    <%= f.file_field :image, class: "form-control form-control-lg" %>
+                </div>
+            </div>
+        </div>
+        <%= f.submit "登録", class: "btn btn-primary shadow-primary btn-lg w-100" %>
+    <% end %>
+</div>
