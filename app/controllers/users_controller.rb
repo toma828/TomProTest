@@ -22,26 +22,35 @@ class UsersController < ApplicationController
   # POST /users or /users.json
   def create
     @user = User.new(user_params)
-
+  
     respond_to do |format|
       if @user.save
-        format.html { redirect_to user_url(@user), notice: "User was successfully created." }
-        format.json { render :show, status: :created, location: @user }
+        if process_video(@user, @user.avatar.path) # @user を引数に渡す
+          format.html { redirect_to @user, notice: 'User was successfully created.' }
+          format.json { render :show, status: :created, location: @user }
+        else
+          format.html { render :new, alert: 'Video processing failed.' }
+          format.json { render json: { error: 'Video processing failed.' }, status: :unprocessable_entity }
+        end
       else
-        format.html { render :new, status: :unprocessable_entity }
+        format.html { render :new }
         format.json { render json: @user.errors, status: :unprocessable_entity }
       end
     end
   end
 
-  # PATCH/PUT /users/1 or /users/1.json
   def update
     respond_to do |format|
       if @user.update(user_params)
-        format.html { redirect_to user_url(@user), notice: "User was successfully updated." }
-        format.json { render :show, status: :ok, location: @user }
+        if process_video(@user.avatar.path)
+          format.html { redirect_to @user, notice: 'User was successfully updated.' }
+          format.json { render :show, status: :ok, location: @user }
+        else
+          format.html { render :edit, alert: 'Video processing failed.' }
+          format.json { render json: { error: 'Video processing failed.' }, status: :unprocessable_entity }
+        end
       else
-        format.html { render :edit, status: :unprocessable_entity }
+        format.html { render :edit }
         format.json { render json: @user.errors, status: :unprocessable_entity }
       end
     end
@@ -58,10 +67,26 @@ class UsersController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_user
-      @user = User.find(params[:id])
+
+  def process_video(user, video_path)
+    output_path_mp4 = "#{File.dirname(video_path)}/bw_#{File.basename(video_path, '.*')}.mp4"
+    output_path_gif = "#{File.dirname(video_path)}/bw_#{File.basename(video_path, '.*')}.gif"
+    Rails.logger.info "Running python script to convert video to black and white"
+    result = system("python3 Python/convert_to_black_and_white.py #{video_path} #{output_path_mp4} #{output_path_gif}")
+    Rails.logger.info "Python script executed: #{result}"
+    if File.exist?(output_path_gif)
+      user.update(avatar: File.open(output_path_gif)) # user を使って更新
+      Rails.logger.info "Video processed and file saved: #{output_path_gif}"
+      return true
+    else
+      Rails.logger.error "Video processing failed. File not found: #{output_path_gif}"
+      return false
     end
+  end
+
+  def set_user
+    @user = User.find(params[:id])
+  end
 
     # Only allow a list of trusted parameters through.
     def user_params

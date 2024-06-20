@@ -1,23 +1,16 @@
-<div id="<%= dom_id user %>">
+<div id="<%= dom_id @user %>">
   <p>
     <strong>Username:</strong>
-    <%= user.username %>
+    <%= @user.username %>
   </p>
-
   <p>
     <strong>Age:</strong>
-    <%= user.age %>
+    <%= @user.age %>
   </p>
-
-  <% if @user.avatar? %>  <!-- アップロード画像がある場合に実行する -->
+  <% if @user.avatar? %>
     <p>
       <strong>Avatar:</strong>
-      <%= image_tag @user.avatar.url %><!-- userインスタンスの画像ファイルのURLを取得し表示 -->
+      <%= image_tag @user.avatar.url, size: "500x500" %>
     </p>
-    <p>
-      <%= video_tag(@user.avatar.url, loop: true, autoplay: true, muted: true, size:500, width:500) %>
-    </p>
-    
   <% end %>
-
 </div>
